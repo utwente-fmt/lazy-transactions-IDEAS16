@@ -625,7 +625,7 @@ case class WideLeaf[K,V](keys : Array[K], values : Array[V], var end : Int) exte
   
   def reduceRange[T](context : Context[K,V], offset : Int, accum : T, f : (T,V) => T, low : K, high : K) : T = {
     var a = accum
-    var i = values.length
+    var i = end
     while(i > 0) {
       i -= 1
       if(context.key.compare(keys(i), high) <= 0 && context.key.compare(keys(i), low) >= 0)
@@ -635,7 +635,7 @@ case class WideLeaf[K,V](keys : Array[K], values : Array[V], var end : Int) exte
   }
   def reduceFrom[T](context : Context[K,V], offset : Int, accum : T, f : (T,V) => T, low : K) : T ={
     var a = accum
-    var i = values.length
+    var i = end
     while(i > 0) {
       i -= 1
       if(context.key.compare(keys(i), low) >= 0)
@@ -645,7 +645,7 @@ case class WideLeaf[K,V](keys : Array[K], values : Array[V], var end : Int) exte
   }
   def reduceUpto[T](context : Context[K,V], offset : Int, accum : T, f : (T,V) => T, high : K) : T = {
     var a = accum
-    var i = values.length
+    var i = end
     while(i > 0) {
       i -= 1
       if(context.key.compare(keys(i), high) <= 0)
@@ -655,7 +655,7 @@ case class WideLeaf[K,V](keys : Array[K], values : Array[V], var end : Int) exte
   }
   def reduceAll[T](accum : T, f : (T,V) => T) : T = {
     var a = accum
-    var i = values.length
+    var i = end
     while(i > 0) {
       i -= 1
       a = f(a, values(i))
@@ -988,6 +988,7 @@ case class TrieBranch[K,V](children : Array[Lazy[TrieNode[K,V]]]) extends TrieNo
       children(i) = getChild(i).compact(context)
       if(!(children(i) eq TrieEmpty._instance))
         allEmpty = false
+      i += 1
     }
     
     if(allEmpty)
